@@ -18,7 +18,7 @@ public class UserDao_imp implements UserDao{
     private static final String SQL_USER_EXIST = "SELECT 1 FROM user WHERE accountCard = ? LIMIT 1";
     private static final String SQL_USER_LOGIN = "select type from user where accountCard=? and `password`=?";
 
-    private static final String SQL_USER_ADD = "INSERT INTO user(signTime,accountCard,`password`) VALUES(?,?,?)";
+    private static final String SQL_USER_ADD = "INSERT INTO user(signTime,accountCard,`password`,`balance`,`type`) VALUES(?,?,?,?,?)";
     @Override
     public int login(User user) {
         Connection conn = JDBCUtils.getConnection();
@@ -62,6 +62,8 @@ public class UserDao_imp implements UserDao{
                     preparedStatementADD.setString(1, dateFormat.format(date));
                     preparedStatementADD.setInt(2, user.getAccountCard());
                     preparedStatementADD.setString(3, user.getPassword());
+                    preparedStatementADD.setDouble(4, 0.0);
+                    preparedStatementADD.setInt(5, 1);
                     resultADD = preparedStatementADD.executeUpdate();
                     if (resultADD != 0) {
                         System.out.println("注册成功！");
@@ -85,7 +87,22 @@ public class UserDao_imp implements UserDao{
     }
 
     @Override
+    public int deleteUser(int accountCard) {
+        return 0;
+    }
+
+    @Override
+    public int uodateUser(User user) {
+        return 0;
+    }
+
+    @Override
     public int changePassword(User user) {
+        return 0;
+    }
+
+    @Override
+    public int selectUser(User user) {
         return 0;
     }
 

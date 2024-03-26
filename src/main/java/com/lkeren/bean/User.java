@@ -9,7 +9,7 @@ package com.lkeren.bean;
  */
 public class User {
     private String signTime;  // 开户时间
-    private int accountCard;  // 账户卡号
+    private int accountCard;  // 账户卡号,如果用户输入了卡号就用用户的卡号，如果没有输入就用身份证hashcode()过来
     private String accountName;  // 账户名称
     private String mobile;  // 手机号码
     private String IDcard;  // 身份证

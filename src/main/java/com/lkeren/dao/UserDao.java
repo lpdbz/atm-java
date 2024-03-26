@@ -13,8 +13,14 @@ public interface UserDao {
     // 验证登录的方法
     int login( User user );
 
+    int deleteUser(int accountCard);
+
+    int uodateUser(User user);
+
     //  修改密码
     int changePassword(User user);
+
+    int selectUser(User user);
 
     // 取款业务
     int drawMoney(User user);
