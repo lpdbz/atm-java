@@ -38,7 +38,7 @@ public class UserDao_imp implements UserDao{
                     preparedStatementLogin.setInt(1, user.getAccountCard());
                     preparedStatementLogin.setString(2, user.getPassword());
                     resultLogin = preparedStatementLogin.executeQuery();
-                    while (resultLogin.next()){
+                    while(resultLogin.next()){
                         if (resultLogin.getInt("type") == 0) {
                             System.out.println("恭喜管理员登录成功！");
                             return 0;
