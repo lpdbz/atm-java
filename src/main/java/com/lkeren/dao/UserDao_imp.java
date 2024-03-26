@@ -2,12 +2,9 @@ package com.lkeren.dao;
 
 import com.lkeren.bean.User;
 import com.lkeren.jdbc.JDBCUtils;
-import com.lkeren.view.View;
 
-import javax.xml.crypto.Data;
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Date;
 
 /**
