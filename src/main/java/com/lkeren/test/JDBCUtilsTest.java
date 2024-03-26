@@ -40,6 +40,6 @@ public class JDBCUtilsTest {
         UserDao_imp userDaoImp = new UserDao_imp();
         User userLogin = View.loginView();
         int login = userDaoImp.login(userLogin);
-        System.out.println(login);
+        System.out.println(login);  // -1:登录注册失败  0:管理员登录成功  1:用户登录成功  2:用户注册成功
     }
 }

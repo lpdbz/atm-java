@@ -25,42 +25,66 @@ public class UserDao_imp implements UserDao{
     @Override
     public int login(User user) {
         Connection conn = JDBCUtils.getConnection();
+        PreparedStatement preparedStatementExist = null;
+        ResultSet resultExist = null;
         try {
-            PreparedStatement preparedStatementExist = conn.prepareStatement(SQL_USER_EXIST);
+            preparedStatementExist = conn.prepareStatement(SQL_USER_EXIST);
             preparedStatementExist.setInt(1, user.getAccountCard());
-            ResultSet resultExist = preparedStatementExist.executeQuery();
-            if (resultExist.equals(1)){
-                PreparedStatement preparedStatementLogin = conn.prepareStatement(SQL_USER_LOGIN);
-                preparedStatementLogin.setInt(1, user.getAccountCard());
-                preparedStatementLogin.setString(2, user.getPassword());
-                ResultSet resultLogin = preparedStatementLogin.executeQuery();
-                if(resultLogin.equals(0)){
-                    System.out.println("恭喜管理员登录成功！");
-                }else{
-                    System.out.println("恭喜用户登录成功");
-                }
-            }else{
-                //通过util下的Date包实现获取时间
-                Date date = new Date();
-                SimpleDateFormat dateFormat= new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                PreparedStatement preparedStatementLogin = conn.prepareStatement(SQL_USER_ADD);
+            resultExist = preparedStatementExist.executeQuery(); // 不存在为什么返回不是空
 
-                preparedStatementLogin.setString(1,dateFormat.format(date));
-                preparedStatementLogin.setInt(2, user.getAccountCard());
-                preparedStatementLogin.setString(3, user.getPassword());
-                ResultSet resultLogin = preparedStatementLogin.executeQuery();
-                if (resultLogin != null){
-                    System.out.println("注册成功！");
-                }else {
-                    System.out.println("登录失败！");
+            if (resultExist.next()) {
+                PreparedStatement preparedStatementLogin = null;
+                ResultSet resultLogin = null;
+                try {
+                    preparedStatementLogin = conn.prepareStatement(SQL_USER_LOGIN);
+
+                    preparedStatementLogin.setInt(1, user.getAccountCard());
+                    preparedStatementLogin.setString(2, user.getPassword());
+                    resultLogin = preparedStatementLogin.executeQuery();
+                    while (resultLogin.next()){
+                        if (resultLogin.getInt("type") == 0) {
+                            System.out.println("恭喜管理员登录成功！");
+                            return 0;
+                        } else {
+                            System.out.println("恭喜用户登录成功");
+                            return 1;
+                        }
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    JDBCUtils.close(conn, preparedStatementLogin, resultLogin);
+                }
+            } else {
+                Date date = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                PreparedStatement preparedStatementADD = null;
+                int resultADD;
+                try {
+                    preparedStatementADD = conn.prepareStatement(SQL_USER_ADD);
+                    preparedStatementADD.setString(1, dateFormat.format(date));
+                    preparedStatementADD.setInt(2, user.getAccountCard());
+                    preparedStatementADD.setString(3, user.getPassword());
+                    resultADD = preparedStatementADD.executeUpdate();
+                    if (resultADD != 0) {
+                        System.out.println("注册成功！");
+                        return 2;
+                    } else {
+                        System.out.println("注册失败！");
+                        return -1;
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    JDBCUtils.close(conn, preparedStatementADD, null);
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } finally {
+            JDBCUtils.close(conn, preparedStatementExist, resultExist);
         }
-
-
-        return 0;
+        return -1;
     }
 
     @Override
