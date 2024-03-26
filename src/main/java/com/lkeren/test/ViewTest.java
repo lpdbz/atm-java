@@ -1,5 +1,9 @@
 package com.lkeren.test;
 
+import com.lkeren.bean.User;
+import com.lkeren.view.View;
+import org.junit.Test;
+
 /**
  * Created with IntelliJ IDEA
  *
@@ -8,4 +12,9 @@ package com.lkeren.test;
  * @Description :
  */
 public class ViewTest {
+    @Test
+    public void indexMenuTest(){
+        User user = View.loginView();
+        System.out.println(user);
+    }
 }

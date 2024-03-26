@@ -8,7 +8,7 @@ package com.lkeren.bean;
  * @Description :
  */
 public class User {
-    private String sign_time;  // 开户时间
+    private String signTime;  // 开户时间
     private int accountCard;  // 账户卡号
     private String accountName;  // 账户名称
     private String mobile;  // 手机号码
@@ -18,6 +18,11 @@ public class User {
     private int type;  // 用户类型  0-管理员，1-用户
 
     public User() {
+    }
+
+    public User(int accountCard, String password) {
+        this.accountCard = accountCard;
+        this.password = password;
     }
 
     public User(int accountCard) {
@@ -52,7 +57,7 @@ public class User {
     }
 
     public User(String sign_time, int accountCard, String accountName, String mobile, String IDcard, String password, double balance, int type) {
-        this.sign_time = sign_time;
+        this.signTime = sign_time;
         this.accountCard = accountCard;
         this.accountName = accountName;
         this.mobile = mobile;
@@ -62,12 +67,12 @@ public class User {
         this.type = type;
     }
 
-    public String getSign_time() {
-        return sign_time;
+    public String getSignTime() {
+        return signTime;
     }
 
-    public void setSign_time(String sign_time) {
-        this.sign_time = sign_time;
+    public void setSignTime(String signTime) {
+        this.signTime = signTime;
     }
 
     public int getAccountCard() {
@@ -116,5 +121,27 @@ public class User {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "sign_time='" + signTime + '\'' +
+                ", accountCard=" + accountCard +
+                ", accountName='" + accountName + '\'' +
+                ", mobile='" + mobile + '\'' +
+                ", IDcard='" + IDcard + '\'' +
+                ", password='" + password + '\'' +
+                ", balance=" + balance +
+                ", type=" + type +
+                '}';
     }
 }

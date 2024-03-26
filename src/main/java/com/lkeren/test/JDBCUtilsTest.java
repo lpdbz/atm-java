@@ -1,6 +1,9 @@
 package com.lkeren.test;
 
+import com.lkeren.bean.User;
+import com.lkeren.dao.UserDao_imp;
 import com.lkeren.jdbc.JDBCUtils;
+import com.lkeren.view.View;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -30,5 +33,13 @@ public class JDBCUtilsTest {
             System.out.print(result.getInt("balance") + " ");
             System.out.println(result.getInt("type"));
         }
+    }
+
+    @Test
+    public void loginTest(){
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User userLogin = View.loginView();
+        int login = userDaoImp.login(userLogin);
+        System.out.println(login);
     }
 }

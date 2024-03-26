@@ -10,9 +10,6 @@ import com.lkeren.bean.User;
  * @Description :
  */
 public interface UserDao {
-    // 注册用户
-    int sign(User user);
-
     // 验证登录的方法
     int login( User user );
 
