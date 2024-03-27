@@ -1,7 +1,6 @@
 package com.lkeren.test;
 
 import com.lkeren.bean.User;
-import com.lkeren.view.AdminView;
 import com.lkeren.view.UserView;
 import org.junit.Test;
 

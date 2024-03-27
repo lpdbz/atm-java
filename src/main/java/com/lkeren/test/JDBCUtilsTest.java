@@ -4,7 +4,6 @@ import com.lkeren.bean.User;
 import com.lkeren.dao.UserDao_imp;
 import com.lkeren.jdbc.JDBCUtils;
 import com.lkeren.view.UserView;
-import com.lkeren.view.View;
 import org.junit.Test;
 
 import java.sql.Connection;

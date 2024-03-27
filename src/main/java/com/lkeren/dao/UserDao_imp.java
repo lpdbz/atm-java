@@ -20,8 +20,6 @@ public class UserDao_imp implements UserDao {
     private static final String SQL_USER_SIGN = "INSERT INTO user VALUES(?,?,?,?,?,?,?,?)";
     private static final String SQL_USER_LOGIN = "select type from user where accountCard=? and `password`=?";
 
-    private static final String SQL_USER_ADD = "INSERT INTO user(signTime,accountCard,`password`,`balance`,`type`) VALUES(?,?,?,?,?)";
-
     private static final String SQL_USER_DELETE = "DELETE FROM `user` WHERE accountCard = ?";
 
     private static final String SQL_USER_UPDATE_PASSWORD = "UPDATE `user` SET `password` = ? WHERE accountCard=?";

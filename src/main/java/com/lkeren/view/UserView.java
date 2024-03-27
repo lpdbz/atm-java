@@ -13,7 +13,7 @@ import java.util.Scanner;
  * @Description :
  */
 public class UserView implements View {
-    private static Scanner input = new Scanner(System.in);
+    private static final Scanner input = new Scanner(System.in);
 
     public int IndexAccountCard;
 

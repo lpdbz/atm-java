@@ -12,7 +12,7 @@ import java.util.Scanner;
  * @Description :
  */
 public class AdminView implements View{
-    private static Scanner input = new Scanner(System.in);
+    private static final Scanner input = new Scanner(System.in);
     public static int IndexAccountCard;
     // 管理员视图
     public User loginView() {

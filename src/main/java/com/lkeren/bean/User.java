@@ -1,7 +1,5 @@
 package com.lkeren.bean;
 
-import java.sql.Date;
-
 /**
  * Created with IntelliJ IDEA
  *
