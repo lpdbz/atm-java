@@ -4,6 +4,7 @@ import com.lkeren.bean.User;
 import com.lkeren.dao.UserDao_imp;
 import com.lkeren.jdbc.JDBCUtils;
 import com.lkeren.view.View;
+import com.sun.scenario.effect.impl.sw.java.JSWBlend_SRC_OUTPeer;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -41,5 +42,13 @@ public class JDBCUtilsTest {
         User userLogin = View.loginView();
         int login = userDaoImp.login(userLogin);
         System.out.println(login);  // -1:登录注册失败  0:管理员登录成功  1:用户登录成功  2:用户注册成功
+    }
+
+    @Test
+    public void deleteUserTest(){
+        UserDao_imp userDaoImp = new UserDao_imp();
+        int accountCard = View.deleteMenuView();
+        int deleteFlag = userDaoImp.deleteUser(accountCard);
+        System.out.println(deleteFlag);
     }
 }

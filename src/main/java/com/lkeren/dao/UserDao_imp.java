@@ -19,6 +19,10 @@ public class UserDao_imp implements UserDao{
     private static final String SQL_USER_LOGIN = "select type from user where accountCard=? and `password`=?";
 
     private static final String SQL_USER_ADD = "INSERT INTO user(signTime,accountCard,`password`,`balance`,`type`) VALUES(?,?,?,?,?)";
+
+    private static final String SQL_USER_DELETE = "DELETE FROM `user` WHERE accountCard = ?";
+
+
     @Override
     public int login(User user) {
         Connection conn = JDBCUtils.getConnection();
@@ -62,8 +66,8 @@ public class UserDao_imp implements UserDao{
                     preparedStatementADD.setString(1, dateFormat.format(date));
                     preparedStatementADD.setInt(2, user.getAccountCard());
                     preparedStatementADD.setString(3, user.getPassword());
-                    preparedStatementADD.setDouble(4, 0.0);
-                    preparedStatementADD.setInt(5, 1);
+                    preparedStatementADD.setDouble(4, 0.0);  // 新增用户余额默认为0.0
+                    preparedStatementADD.setInt(5, 1);  // 新增用户权限默认为  1
                     resultADD = preparedStatementADD.executeUpdate();
                     if (resultADD != 0) {
                         System.out.println("注册成功！");
@@ -88,7 +92,21 @@ public class UserDao_imp implements UserDao{
 
     @Override
     public int deleteUser(int accountCard) {
-        return 0;
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_DELETE);
+            preparedStatement.setString(1, String.valueOf(accountCard));
+            int result = preparedStatement.executeUpdate();
+            if(result > 0){
+                System.out.println("删除成功");
+                return 1;
+            }else {
+                System.out.println("不存在该用户，删除失败");
+                return -1;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
