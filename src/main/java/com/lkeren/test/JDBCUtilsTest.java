@@ -4,7 +4,6 @@ import com.lkeren.bean.User;
 import com.lkeren.dao.UserDao_imp;
 import com.lkeren.jdbc.JDBCUtils;
 import com.lkeren.view.UserView;
-import com.lkeren.view.View;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -54,10 +53,13 @@ public class JDBCUtilsTest {
 
     @Test
     public void deleteUserTest(){
+        UserView userView = new UserView();  // 保证是同一个UserView类
         UserDao_imp userDaoImp = new UserDao_imp();
-        User user = new UserView().loginView();
-        int accountCard = new UserView().deleteMenuView();
-        int deleteFlag = userDaoImp.deleteUser(user.getAccountCard());
+        User user = userView.loginView();
+        int login = userDaoImp.login(user);
+        System.out.println(login);
+        User user1 = userView.deleteMenuView();
+        int deleteFlag = userDaoImp.deleteUser(user1.getAccountCard());
         System.out.println(deleteFlag);
     }
 

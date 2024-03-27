@@ -73,11 +73,13 @@ public class UserView implements View {
     }
 
     // 用户注销自己的账号
-    public int deleteMenuView(){
+    public User deleteMenuView(){
         System.out.println("************************************");
         System.out.println("*******\t\t欢迎来到注销用户界面\t\t*******");
         System.out.println("************************************");
-        return IndexAccountCard;
+        User user = new User();
+        user.setAccountCard(IndexAccountCard);
+        return user;
     }
 
     public int indexUpdateView(){
