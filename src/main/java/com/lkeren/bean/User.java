@@ -1,5 +1,7 @@
 package com.lkeren.bean;
 
+import java.sql.Date;
+
 /**
  * Created with IntelliJ IDEA
  *
@@ -7,6 +9,8 @@ package com.lkeren.bean;
  * @Date : 2024/03/25/17:14
  * @Description :
  */
+
+// 用户和管理员都是属于用户类
 public class User {
     private String signTime;  // 开户时间
     private int accountCard;  // 账户卡号,如果用户输入了卡号就用用户的卡号，如果没有输入就用身份证hashcode()过来，考虑的有点不好，但是因为登录注册写一块了，所以没办法单独输入身份证了
@@ -66,6 +70,15 @@ public class User {
         this.balance = balance;
         this.type = type;
     }
+
+    public User(String accountName, String mobile, String IDcard, String password) {
+        this.accountName = accountName;
+        this.mobile = mobile;
+        this.IDcard = IDcard;
+        this.password = password;
+    }
+
+
 
     public String getSignTime() {
         return signTime;

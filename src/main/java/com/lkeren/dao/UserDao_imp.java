@@ -12,19 +12,62 @@ import java.util.Date;
  *
  * @Author : lkeren
  * @Date : 2024/03/25/18:07
- * @Description :
+ * @Description : 普通用户只允许对自己的账户进行增删改查操作，对自己名下的账户进行存、取款及转账。
  */
-public class UserDao_imp implements UserDao{
+public class UserDao_imp implements UserDao {
     private static final String SQL_USER_EXIST = "SELECT 1 FROM user WHERE accountCard = ? LIMIT 1";
+
+    private static final String SQL_USER_SIGN = "INSERT INTO user VALUES(?,?,?,?,?,?,?,?)";
     private static final String SQL_USER_LOGIN = "select type from user where accountCard=? and `password`=?";
 
     private static final String SQL_USER_ADD = "INSERT INTO user(signTime,accountCard,`password`,`balance`,`type`) VALUES(?,?,?,?,?)";
 
     private static final String SQL_USER_DELETE = "DELETE FROM `user` WHERE accountCard = ?";
 
+    private static final String SQL_USER_UPDATE_PASSWORD = "UPDATE `user` SET `password` = ? WHERE accountCard=?";
+
+    private static final String SQL_USER_SELECT = "SELECT * FROM `user` WHERE accountCard = ?";
+
+
+    public int sign(User user) {
+        Connection conn = JDBCUtils.getConnection();
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        PreparedStatement preparedStatementADD = null;
+        int resultADD;
+        try {
+            preparedStatementADD = conn.prepareStatement(SQL_USER_SIGN);
+            preparedStatementADD.setString(1, dateFormat.format(date));
+            preparedStatementADD.setInt(2, user.getAccountCard());
+            preparedStatementADD.setString(3, user.getAccountName());
+            preparedStatementADD.setString(4, user.getMobile());
+            preparedStatementADD.setString(5, user.getPassword());
+            preparedStatementADD.setDouble(6, 0.0);  // 新增用户余额默认为0.0
+            preparedStatementADD.setInt(7, 1);  // 新增用户权限默认为  1
+            preparedStatementADD.setString(8, user.getIDcard());
+            resultADD = preparedStatementADD.executeUpdate();
+            if (resultADD != 0) {
+                System.out.println("注册成功！");
+                return 2;
+            } else {
+                System.out.println("注册失败！");
+                return -1;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            JDBCUtils.close(conn, preparedStatementADD, null);
+        }
+    }
 
     @Override
     public int login(User user) {
+        /**
+         * 0-管理员登录成功
+         * 1-用户登录成功
+         * 2-转到注册界面
+         * -1 -操作都失败
+         */
         Connection conn = JDBCUtils.getConnection();
         PreparedStatement preparedStatementExist = null;
         ResultSet resultExist = null;
@@ -42,7 +85,7 @@ public class UserDao_imp implements UserDao{
                     preparedStatementLogin.setInt(1, user.getAccountCard());
                     preparedStatementLogin.setString(2, user.getPassword());
                     resultLogin = preparedStatementLogin.executeQuery();
-                    while(resultLogin.next()){
+                    while (resultLogin.next()) {
                         if (resultLogin.getInt("type") == 0) {
                             System.out.println("恭喜管理员登录成功！");
                             return 0;
@@ -57,30 +100,8 @@ public class UserDao_imp implements UserDao{
                     JDBCUtils.close(conn, preparedStatementLogin, resultLogin);
                 }
             } else {
-                Date date = new Date();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                PreparedStatement preparedStatementADD = null;
-                int resultADD;
-                try {
-                    preparedStatementADD = conn.prepareStatement(SQL_USER_ADD);
-                    preparedStatementADD.setString(1, dateFormat.format(date));
-                    preparedStatementADD.setInt(2, user.getAccountCard());
-                    preparedStatementADD.setString(3, user.getPassword());
-                    preparedStatementADD.setDouble(4, 0.0);  // 新增用户余额默认为0.0
-                    preparedStatementADD.setInt(5, 1);  // 新增用户权限默认为  1
-                    resultADD = preparedStatementADD.executeUpdate();
-                    if (resultADD != 0) {
-                        System.out.println("注册成功！");
-                        return 2;
-                    } else {
-                        System.out.println("注册失败！");
-                        return -1;
-                    }
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    JDBCUtils.close(conn, preparedStatementADD, null);
-                }
+                System.out.println("数据库中不存在该用户账号");
+                return 2;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -95,13 +116,39 @@ public class UserDao_imp implements UserDao{
         Connection conn = JDBCUtils.getConnection();
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_DELETE);
-            preparedStatement.setString(1, String.valueOf(accountCard));
-            int result = preparedStatement.executeUpdate();
-            if(result > 0){
-                System.out.println("删除成功");
+            preparedStatement.setInt(1, accountCard);
+            int deleteFlag = preparedStatement.executeUpdate();
+            if (deleteFlag > 0) {
+                System.out.println("删除用户成功");
                 return 1;
-            }else {
-                System.out.println("不存在该用户，删除失败");
+            } else {
+                System.out.println("删除用户失败");
+                return -1;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Override
+    public int updateUser(User user) {
+        return 0;
+    }
+
+    @Override
+    public int changePassword(User user) {
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_UPDATE_PASSWORD);
+            preparedStatement.setString(1, user.getPassword());
+            preparedStatement.setInt(2, user.getAccountCard());
+            int changePasswordFlag = preparedStatement.executeUpdate();
+            if (changePasswordFlag > 0) {
+                System.out.println("修改密码成功");
+                return 1;
+            } else {
+                System.out.println("修改密码失败");
                 return -1;
             }
         } catch (SQLException e) {
@@ -110,18 +157,27 @@ public class UserDao_imp implements UserDao{
     }
 
     @Override
-    public int uodateUser(User user) {
-        return 0;
-    }
-
-    @Override
-    public int changePassword(User user) {
-        return 0;
-    }
-
-    @Override
-    public int selectUser(User user) {
-        return 0;
+    public User selectUser(User user) {
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_SELECT);
+            preparedStatement.setInt(1,user.getAccountCard());
+            ResultSet result = preparedStatement.executeQuery();
+            while (result.next()) {
+                String signTime = String.valueOf(result.getDate("signTime"));
+                int accountCard = result.getInt("accountCard");
+                String accountName = result.getString("accountName");
+                String mobile = result.getString("mobile");
+                String idCard = result.getString("idCard");
+                String password = result.getString("password");
+                int balance = result.getInt("balance");
+                int type = result.getInt("type");
+                return new User(signTime, accountCard, accountName, mobile, idCard, password, balance, type);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
     }
 
     @Override

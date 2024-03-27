@@ -3,8 +3,8 @@ package com.lkeren.test;
 import com.lkeren.bean.User;
 import com.lkeren.dao.UserDao_imp;
 import com.lkeren.jdbc.JDBCUtils;
+import com.lkeren.view.UserView;
 import com.lkeren.view.View;
-import com.sun.scenario.effect.impl.sw.java.JSWBlend_SRC_OUTPeer;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -37,9 +37,17 @@ public class JDBCUtilsTest {
     }
 
     @Test
+    public void signTest(){
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user = new UserView().signView();
+        int sign = userDaoImp.sign(user);
+        System.out.println(sign);
+    }
+
+    @Test
     public void loginTest(){
         UserDao_imp userDaoImp = new UserDao_imp();
-        User userLogin = View.loginView();
+        User userLogin = new UserView().loginView();
         int login = userDaoImp.login(userLogin);
         System.out.println(login);  // -1:登录注册失败  0:管理员登录成功  1:用户登录成功  2:用户注册成功
     }
@@ -47,8 +55,28 @@ public class JDBCUtilsTest {
     @Test
     public void deleteUserTest(){
         UserDao_imp userDaoImp = new UserDao_imp();
-        int accountCard = View.deleteMenuView();
-        int deleteFlag = userDaoImp.deleteUser(accountCard);
+        User user = new UserView().loginView();
+        int accountCard = new UserView().deleteMenuView();
+        int deleteFlag = userDaoImp.deleteUser(user.getAccountCard());
         System.out.println(deleteFlag);
+    }
+
+    @Test
+    public void changePasswordTest(){
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user1 = new UserView().loginView();
+        int login = userDaoImp.login(user1);
+        System.out.println(login);
+        User user = new UserView().updatePasswordMenuView();
+        int changePassword = userDaoImp.changePassword(user1);
+        System.out.println(changePassword);
+    }
+
+    @Test
+    public void selectUserTest(){
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user = new UserView().loginView();
+        User user1 = userDaoImp.selectUser(user);
+        new UserView().printUser(user1);
     }
 }

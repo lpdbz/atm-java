@@ -1,7 +1,8 @@
 package com.lkeren.test;
 
 import com.lkeren.bean.User;
-import com.lkeren.view.View;
+import com.lkeren.view.AdminView;
+import com.lkeren.view.UserView;
 import org.junit.Test;
 
 /**
@@ -13,8 +14,14 @@ import org.junit.Test;
  */
 public class ViewTest {
     @Test
-    public void indexMenuTest(){
-        User user = View.loginView();
+    public void signMenuTest(){
+        User user = new UserView().signView();
+        System.out.println(user);
+    }
+
+    @Test
+    public void loginMenuTest(){
+        User user = new UserView().loginView();
         System.out.println(user);
     }
 }
