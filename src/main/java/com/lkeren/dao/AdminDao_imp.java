@@ -42,11 +42,6 @@ public class AdminDao_imp implements UserDao{
     }
 
     @Override
-    public int updateUser(User user) {
-        return 0;
-    }
-
-    @Override
     public int changePassword(User user) {
         return 0;
     }

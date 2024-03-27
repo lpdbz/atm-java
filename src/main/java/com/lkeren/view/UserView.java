@@ -104,7 +104,10 @@ public class UserView implements View {
         System.out.println("*******\t\t请输入新密码：\t\t*******");
         String upass = input.nextLine();
         System.out.println("************************************");
-        return new User( IndexAccountCard, upass );
+        User user = new User();
+        user.setPassword(upass);
+        user.setAccountCard(IndexAccountCard);
+        return user;
     }
 
     public User updateAccountNameMenuView(){
@@ -113,7 +116,10 @@ public class UserView implements View {
         System.out.println("*******\t\t请输入新账号名称：\t\t*******");
         String uaccountName = input.nextLine();
         System.out.println("************************************");
-        return new User( IndexAccountCard, uaccountName );
+        User user = new User();
+        user.setAccountName(uaccountName);
+        user.setAccountCard(IndexAccountCard);
+        return user;
     }
 
     public User updateMobileMenuView(){
@@ -122,7 +128,10 @@ public class UserView implements View {
         System.out.println("*******\t\t请输入新手机号码：\t\t*******");
         String umobile = input.nextLine();
         System.out.println("************************************");
-        return new User( IndexAccountCard, umobile );
+        User user = new User();
+        user.setMobile(umobile);
+        user.setAccountCard(IndexAccountCard);
+        return user;
     }
 
     public void printUser(User user){

@@ -16,8 +16,6 @@ public interface UserDao {
 
     int deleteUser(int accountCard);
 
-    int updateUser(User user);
-
     //  修改密码
     int changePassword(User user);
 

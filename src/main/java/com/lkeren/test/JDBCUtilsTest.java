@@ -4,6 +4,7 @@ import com.lkeren.bean.User;
 import com.lkeren.dao.UserDao_imp;
 import com.lkeren.jdbc.JDBCUtils;
 import com.lkeren.view.UserView;
+import com.lkeren.view.View;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -62,13 +63,38 @@ public class JDBCUtilsTest {
 
     @Test
     public void changePasswordTest(){
+        UserView userView = new UserView();
         UserDao_imp userDaoImp = new UserDao_imp();
-        User user1 = new UserView().loginView();
+        User user1 = userView.loginView();
         int login = userDaoImp.login(user1);
         System.out.println(login);
-        User user = new UserView().updatePasswordMenuView();
-        int changePassword = userDaoImp.changePassword(user1);
+        User user = userView.updatePasswordMenuView();
+        int changePassword = userDaoImp.changePassword(user);
         System.out.println(changePassword);
+    }
+
+    @Test
+    public void changeAccountNameTest(){
+        UserView userView = new UserView();
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user1 = userView.loginView();
+        int login = userDaoImp.login(user1);
+        System.out.println(login);
+        User user = userView.updateAccountNameMenuView();
+        int changeAccountName = userDaoImp.updateAccountName(user);
+        System.out.println(changeAccountName);
+    }
+
+    @Test
+    public void changeMobileTest(){
+        UserView userView = new UserView();
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user1 = userView.loginView();
+        int login = userDaoImp.login(user1);
+        System.out.println(login);
+        User user =userView.updateMobileMenuView();
+        int changeMobile = userDaoImp.updateMobile(user);
+        System.out.println(changeMobile);
     }
 
     @Test

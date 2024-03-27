@@ -23,6 +23,9 @@ public class UserDao_imp implements UserDao {
     private static final String SQL_USER_DELETE = "DELETE FROM `user` WHERE accountCard = ?";
 
     private static final String SQL_USER_UPDATE_PASSWORD = "UPDATE `user` SET `password` = ? WHERE accountCard=?";
+    private static final String SQL_USER_UPDATE_ACCOUNT_NAME = "UPDATE `user` SET `accountName` = ? WHERE accountCard=?";
+    private static final String SQL_USER_UPDATE_MOBILE = "UPDATE `user` SET `mobile` = ? WHERE accountCard=?";
+
 
     private static final String SQL_USER_SELECT = "SELECT * FROM `user` WHERE accountCard = ?";
 
@@ -129,9 +132,42 @@ public class UserDao_imp implements UserDao {
     }
 
 
-    @Override
-    public int updateUser(User user) {
-        return 0;
+    public int updateAccountName(User user) {
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_UPDATE_ACCOUNT_NAME);
+            preparedStatement.setString(1, user.getAccountName());
+            preparedStatement.setInt(2, user.getAccountCard());
+            int changePasswordFlag = preparedStatement.executeUpdate();
+            if (changePasswordFlag > 0) {
+                System.out.println("修改账户姓名成功");
+                return 1;
+            } else {
+                System.out.println("修改账户姓名失败");
+                return -1;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int updateMobile(User user){
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_UPDATE_MOBILE);
+            preparedStatement.setString(1, user.getMobile());
+            preparedStatement.setInt(2, user.getAccountCard());
+            int changePasswordFlag = preparedStatement.executeUpdate();
+            if (changePasswordFlag > 0) {
+                System.out.println("修改电话号码成功");
+                return 1;
+            } else {
+                System.out.println("修改电话号码失败");
+                return -1;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
