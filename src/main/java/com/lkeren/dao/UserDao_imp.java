@@ -15,7 +15,6 @@ import java.util.Date;
  * @Description : 普通用户只允许对自己的账户进行增删改查操作，对自己名下的账户进行存、取款及转账。
  */
 public class UserDao_imp implements UserDao {
-    private double BankTotalMoney = 0;
     private static final String SQL_USER_EXIST = "SELECT 1 FROM user WHERE accountCard = ? LIMIT 1";
 
     private static final String SQL_USER_SIGN = "INSERT INTO user VALUES(?,?,?,?,?,?,?,?)";
@@ -74,11 +73,11 @@ public class UserDao_imp implements UserDao {
 
     @Override
     public int login(User user) {
-        /**
-         * 0-管理员登录成功
-         * 1-用户登录成功
-         * 2-转到注册界面
-         * -1 -操作都失败
+        /*
+          0-管理员登录成功
+          1-用户登录成功
+          2-转到注册界面
+          -1 -操作都失败
          */
         Connection conn = JDBCUtils.getConnection();
         PreparedStatement preparedStatementExist = null;
@@ -240,7 +239,7 @@ public class UserDao_imp implements UserDao {
 
     @Override
     public int drawMoney(int accountCard, double money) {
-        /**
+        /*
          * 1  --  取款成功
          * -1 --  取款失败
          * 2  --  余额不够
@@ -280,7 +279,7 @@ public class UserDao_imp implements UserDao {
 
     @Override
     public int saveMoney(int accountCard, double money) {
-        /**
+        /*
          * 1  --  存款成功
          * -1 --  存款失败
          */
@@ -315,11 +314,11 @@ public class UserDao_imp implements UserDao {
 
     @Override
     public int transderMoney(int oldAccountCard,int newAccountCard, double money) {
-        /**
-         * 1  --  转账成功
-         * -1 --  转账失败
-         * 2  --  余额不够转账
-         * 3  -- 转账账户不存在
+        /*
+          1  --  转账成功
+          -1 --  转账失败
+          2  --  余额不够转账
+          3  -- 转账账户不存在
          */
         Connection conn = JDBCUtils.getConnection();
         PreparedStatement preparedStatement2 = null;
