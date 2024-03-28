@@ -26,8 +26,12 @@ public class UserDao_imp implements UserDao {
     private static final String SQL_USER_UPDATE_ACCOUNT_NAME = "UPDATE `user` SET `accountName` = ? WHERE accountCard=?";
     private static final String SQL_USER_UPDATE_MOBILE = "UPDATE `user` SET `mobile` = ? WHERE accountCard=?";
 
+    private static final String SQL_USER_DRAW_MONEY = "UPDATE `user` SET `balance` = ? WHERE accountCard=?";
+    private static final String SQL_USER_TRANSFER_MONEY = "UPDATE `user` SET `balance` = ? WHERE accountCard=?";
 
     private static final String SQL_USER_SELECT = "SELECT * FROM `user` WHERE accountCard = ?";
+
+    private static final String SQL_USER_LOGS_SELECT = "select * from user_logs WHERE accountCard=?";
 
 
     public int sign(User user) {
@@ -215,27 +219,164 @@ public class UserDao_imp implements UserDao {
     }
 
     @Override
-    public int drawMoney(User user) {
+    public int drawMoney(int accountCard, double money) {
+        /**
+         * 1  --  取款成功
+         * -1 --  取款失败
+         * 2  --  余额不够
+         */
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            // 先查询钱是否足够取出，然后再执行金额的修改
+            PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_SELECT);
+            preparedStatement.setDouble(1, accountCard);
+            ResultSet result = preparedStatement.executeQuery();
+            while(result.next()){
+                double balance = result.getDouble("balance");
+                if(balance > 0  && balance >= money){
+                    PreparedStatement preparedStatement1 = conn.prepareStatement(SQL_USER_DRAW_MONEY);
+                    preparedStatement1.setDouble(1,(balance-money));
+                    preparedStatement1.setInt(2,accountCard);
+                    int drawFlag = preparedStatement1.executeUpdate();
+                    if(drawFlag > 0){
+                        System.out.println("取款成功");
+                        return 1;
+                    }else {
+                        System.out.println("取款失败");
+                        return -1;
+                    }
+                }else {
+                    System.out.println("您的余额不够");
+                    return 2;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return 0;
     }
 
     @Override
-    public int saveMoney(User user) {
+    public int saveMoney(int accountCard, double money) {
+        /**
+         * 1  --  存款成功
+         * -1 --  存款失败
+         */
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_SELECT);
+            preparedStatement.setDouble(1, accountCard);
+            ResultSet result = preparedStatement.executeQuery();
+            while(result.next()){
+                double balance = result.getDouble("balance");
+                if(balance >= 0){
+                    PreparedStatement preparedStatement1 = conn.prepareStatement(SQL_USER_DRAW_MONEY);
+                    preparedStatement1.setDouble(1,(balance+money));
+                    preparedStatement1.setInt(2,accountCard);
+                    int drawFlag = preparedStatement1.executeUpdate();
+                    if(drawFlag > 0){
+                        System.out.println("存款成功");
+                        return 1;
+                    }else {
+                        System.out.println("存款失败");
+                        return -1;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return 0;
     }
 
     @Override
-    public int transderMoney(User user) {
+    public int transderMoney(int oldAccountCard,int newAccountCard, double money) {
+        /**
+         * 1  --  转账成功
+         * -1 --  转账失败
+         * 2  --  余额不够转账
+         * 3  -- 转账账户不存在
+         */
+        Connection conn = JDBCUtils.getConnection();
+        PreparedStatement preparedStatement2 = null;
+        try {
+            preparedStatement2 = conn.prepareStatement(SQL_USER_SELECT);
+            preparedStatement2.setDouble(1, newAccountCard);
+            ResultSet result2 = preparedStatement2.executeQuery();
+            while(result2.next()){
+                double newBalance = result2.getDouble("balance");
+                System.out.println("转账账户存在");
+                try {
+                    // 先查询钱是否足够取出，然后再执行金额的修改
+                    PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_SELECT);
+                    preparedStatement.setDouble(1, oldAccountCard);
+                    ResultSet result = preparedStatement.executeQuery();
+                    while(result.next()){
+                        double OldBalance = result.getDouble("balance");
+                        if(OldBalance > 0 && newBalance >= 0  && OldBalance >= money){
+                            //  老账户减
+                            PreparedStatement preparedStatement1 = conn.prepareStatement(SQL_USER_DRAW_MONEY);
+                            preparedStatement1.setDouble(1,(OldBalance-money));
+                            preparedStatement1.setInt(2,oldAccountCard);
+
+                            // 新账户加
+                            PreparedStatement preparedStatement3 = conn.prepareStatement(SQL_USER_DRAW_MONEY);
+                            preparedStatement3.setDouble(1,(newBalance+money));
+                            preparedStatement3.setInt(2,newAccountCard);
+
+                            int drawFlag = preparedStatement1.executeUpdate();
+                            int saveFlag = preparedStatement3.executeUpdate();
+                            if(drawFlag > 0 && saveFlag > 0){
+                                System.out.println("转账成功");
+                                return 1;
+                            }else {
+                                System.out.println("转账失败");
+                                return -1;
+                            }
+                        }else {
+                            System.out.println("您的余额不够转账");
+                            return 2;
+                        }
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("转账账户不存在");
+        return 3;
+    }
+
+    // 调用的时候，给登录者的id就行了吧；不需要user一个，admin一个了。
+    @Override
+    public int userLogRecord(int accountCard) {
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_LOGS_SELECT);
+            preparedStatement.setInt(1,accountCard);
+            ResultSet result = preparedStatement.executeQuery();
+            System.out.println("operateTime\t\t\taccountCard\t\taccountName\t\toper");
+            while(result.next()){
+                String operateTime = result.getString("operateTime");
+                int accountCard1 = result.getInt("accountCard");
+                String accountName = result.getString("accountName");
+                String oper = result.getString("oper");
+                System.out.println(operateTime + "\t\t" + accountCard1 + "\t\t\t\t" + accountName + "\t\t\t" + oper);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return 0;
     }
 
+
+    // 用户查看自己余额变化
     @Override
-    public int balanceChange(User user) {
+    public int balanceChange(int accountCard) {
+        System.out.println("operateTime\t\t\taccountCard\t\toper\t\tbalance\t\tmoney");
         return 0;
     }
 
-    @Override
-    public int userLogRecord(User user) {
-        return 0;
-    }
 }

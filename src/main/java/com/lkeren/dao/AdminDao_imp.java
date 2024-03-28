@@ -52,27 +52,30 @@ public class AdminDao_imp implements UserDao{
     }
 
     @Override
-    public int drawMoney(User user) {
+    public int drawMoney(int accountCard, double money) {
         return 0;
     }
 
     @Override
-    public int saveMoney(User user) {
+    public int saveMoney(int accountCard, double money) {
         return 0;
     }
 
     @Override
-    public int transderMoney(User user) {
+    public int transderMoney(int oldAccountCard, int newAccountCard, double money) {
+        return 0;
+    }
+
+
+    @Override
+    public int balanceChange(int accountCard) {
         return 0;
     }
 
     @Override
-    public int balanceChange(User user) {
+    public int userLogRecord(int accountCard) {
         return 0;
     }
 
-    @Override
-    public int userLogRecord(User user) {
-        return 0;
-    }
+
 }

@@ -24,6 +24,57 @@ public class AdminView implements View{
         return null;
     }
 
+    public User drawMoneyView(){
+        System.out.println("************************************");
+        System.out.println("*******\t\t欢迎来到取款界面\t\t*******");
+        System.out.println("*******\t\t请输入取款账户：\t\t*******");
+        int accountCard = Integer.parseInt(input.nextLine());
+        System.out.println("*******\t\t请输入您想要取款的金额：\t\t*******");
+        double drawMoney = Double.parseDouble(input.nextLine());
+        System.out.println("************************************");
+        User user = new User();
+        user.setAccountCard(accountCard);
+        user.setBalance(drawMoney);
+        return user;
+    }
+
+    public double saveMoneyMenuView(){
+        System.out.println("************************************");
+        System.out.println("*******\t\t欢迎来到存款界面\t\t*******");
+        System.out.println("*******\t\t请输入您想要存款的金额：\t\t*******");
+        double saveMoney = Double.parseDouble(input.nextLine());
+        System.out.println("************************************");
+        return saveMoney;
+    }
+
+    public User transferMoneyMenuView(){
+        System.out.println("************************************");
+        System.out.println("*******\t\t请根据提示操作\t\t*******");
+        System.out.println("*******\t\t请输入您想要转账的账户：\t\t*******");
+        int newAccountCard = Integer.parseInt(input.nextLine());
+        System.out.println("*******\t\t请输入您想要转账的金额：\t\t*******");
+        double transferMoney = Double.parseDouble(input.nextLine());
+        System.out.println("************************************");
+        User user = new User();
+        user.setAccountCard(newAccountCard);
+        user.setBalance(transferMoney);
+        return user;
+    }
+
+    public int balanceChangeMenuView(){
+        System.out.println("************************************");
+        System.out.println("*******\t\t欢迎来到余额改变界面\t\t*******");
+        System.out.println("************************************");
+        return 0;
+    }
+
+    public int userLogRecordMenuView(){
+        System.out.println("************************************");
+        System.out.println("*******\t\t欢迎来到日志界面\t\t*******");
+        System.out.println("************************************");
+        return 0;
+    }
+
     // 管理员视图
     public static int AdminMenuView(){
         System.out.println("************************************");

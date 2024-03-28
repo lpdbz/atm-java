@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Scanner;
 
 /**
  * Created with IntelliJ IDEA
@@ -105,5 +106,42 @@ public class JDBCUtilsTest {
         User user = new UserView().loginView();
         User user1 = userDaoImp.selectUser(user);
         new UserView().printUser(user1);
+    }
+
+    @Test
+    public void drawMoneyTest(){
+        Scanner input = new Scanner(System.in);
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user = new UserView().loginView();
+        double money = new UserView().drawMoneyView();
+        int drawFlag = userDaoImp.drawMoney(user.getAccountCard(), money);
+        System.out.println(drawFlag);
+    }
+
+    @Test
+    public void saveMoneyTest(){
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user = new UserView().loginView();
+        double money = new UserView().saveMoneyMenuView();
+        int drawFlag = userDaoImp.saveMoney(user.getAccountCard(), money);
+        System.out.println(drawFlag);
+    }
+
+    @Test
+    public void transderMoneyTest(){
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user = new UserView().loginView();
+        User user1 = new UserView().transferMoneyMenuView();  // 转账账户
+        int transferFlag = userDaoImp.transderMoney(user.getAccountCard(),user1.getAccountCard(),user1.getBalance());
+        System.out.println(transferFlag);
+    }
+
+    @Test
+    public void balanceChangeTest() {
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user = new UserView().loginView();
+        int log = new UserView().userLogRecordMenuView();
+        int userLogRecord = userDaoImp.userLogRecord(user.getAccountCard());
+        System.out.println(userLogRecord);
     }
 }

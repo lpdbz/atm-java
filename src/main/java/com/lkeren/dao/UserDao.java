@@ -22,17 +22,17 @@ public interface UserDao {
     User selectUser(User user);
 
     // 取款业务
-    int drawMoney(User user);
+    int drawMoney(int accountCard, double money);
 
     // 存款业务
-    int saveMoney(User user);
+    int saveMoney(int accountCard, double money);
 
     // 转账业务
-    int transderMoney(User user);
+    int transderMoney(int oldAccountCard, int newAccountCard, double money);
 
     // 余额变动记录
-    int balanceChange(User user);
+    int balanceChange(int accountCard);
 
     // 用户日志logs记录
-    int userLogRecord(User user);
+    int userLogRecord(int accountCard);
 }
