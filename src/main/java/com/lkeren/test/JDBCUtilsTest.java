@@ -65,18 +65,6 @@ public class JDBCUtilsTest {
     }
 
     @Test
-    public void changePasswordTest(){
-        UserView userView = new UserView();
-        UserDao_imp userDaoImp = new UserDao_imp();
-        User user1 = userView.loginView();
-        int login = userDaoImp.login(user1);
-        System.out.println(login);
-        User user = userView.updatePasswordMenuView();
-        int changePassword = userDaoImp.changePassword(user);
-        System.out.println(changePassword);
-    }
-
-    @Test
     public void changeAccountNameTest(){
         UserView userView = new UserView();
         UserDao_imp userDaoImp = new UserDao_imp();
@@ -98,6 +86,18 @@ public class JDBCUtilsTest {
         User user =userView.updateMobileMenuView();
         int changeMobile = userDaoImp.updateMobile(user);
         System.out.println(changeMobile);
+    }
+
+    @Test
+    public void changePasswordTest(){
+        UserView userView = new UserView();
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user1 = userView.loginView();
+        int login = userDaoImp.login(user1);
+        System.out.println(login);
+        User user = userView.updatePasswordMenuView();
+        int changePassword = userDaoImp.changePassword(user);
+        System.out.println(changePassword);
     }
 
     @Test
@@ -137,11 +137,20 @@ public class JDBCUtilsTest {
     }
 
     @Test
-    public void balanceChangeTest() {
+    public void userLogRecordTest() {
         UserDao_imp userDaoImp = new UserDao_imp();
         User user = new UserView().loginView();
         int log = new UserView().userLogRecordMenuView();
         int userLogRecord = userDaoImp.userLogRecord(user.getAccountCard());
+        System.out.println(userLogRecord);
+    }
+
+    @Test
+    public void balanceChangeTest() {
+        UserDao_imp userDaoImp = new UserDao_imp();
+        User user = new UserView().loginView();
+        int log = new UserView().balanceChangeMenuView();
+        int userLogRecord = userDaoImp.balanceChange(user.getAccountCard());
         System.out.println(userLogRecord);
     }
 }

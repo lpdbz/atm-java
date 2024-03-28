@@ -15,9 +15,12 @@ import java.util.Date;
  * @Description : 普通用户只允许对自己的账户进行增删改查操作，对自己名下的账户进行存、取款及转账。
  */
 public class UserDao_imp implements UserDao {
+    private double BankTotalMoney = 0;
     private static final String SQL_USER_EXIST = "SELECT 1 FROM user WHERE accountCard = ? LIMIT 1";
 
     private static final String SQL_USER_SIGN = "INSERT INTO user VALUES(?,?,?,?,?,?,?,?)";
+
+    private static final String SQL_USER_LOGS = "insert into user_logs VALUES(?,?,?,?)";
     private static final String SQL_USER_LOGIN = "select type from user where accountCard=? and `password`=?";
 
     private static final String SQL_USER_DELETE = "DELETE FROM `user` WHERE accountCard = ?";
@@ -26,33 +29,37 @@ public class UserDao_imp implements UserDao {
     private static final String SQL_USER_UPDATE_ACCOUNT_NAME = "UPDATE `user` SET `accountName` = ? WHERE accountCard=?";
     private static final String SQL_USER_UPDATE_MOBILE = "UPDATE `user` SET `mobile` = ? WHERE accountCard=?";
 
-    private static final String SQL_USER_DRAW_MONEY = "UPDATE `user` SET `balance` = ? WHERE accountCard=?";
-    private static final String SQL_USER_TRANSFER_MONEY = "UPDATE `user` SET `balance` = ? WHERE accountCard=?";
+    private static final String SQL_USER_OPER_MONEY = "UPDATE `user` SET `balance` = ? WHERE accountCard=?";
 
     private static final String SQL_USER_SELECT = "SELECT * FROM `user` WHERE accountCard = ?";
 
     private static final String SQL_USER_LOGS_SELECT = "select * from user_logs WHERE accountCard=?";
 
+    Date date = new Date();
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public int sign(User user) {
         Connection conn = JDBCUtils.getConnection();
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         PreparedStatement preparedStatementADD = null;
         int resultADD;
         try {
+            // 将注册信息写入user表
             preparedStatementADD = conn.prepareStatement(SQL_USER_SIGN);
             preparedStatementADD.setString(1, dateFormat.format(date));
             preparedStatementADD.setInt(2, user.getAccountCard());
             preparedStatementADD.setString(3, user.getAccountName());
             preparedStatementADD.setString(4, user.getMobile());
-            preparedStatementADD.setString(5, user.getPassword());
-            preparedStatementADD.setDouble(6, 0.0);  // 新增用户余额默认为0.0
-            preparedStatementADD.setInt(7, 1);  // 新增用户权限默认为  1
-            preparedStatementADD.setString(8, user.getIDcard());
+            preparedStatementADD.setString(5, user.getIDcard());
+            preparedStatementADD.setString(6, user.getPassword());
+            preparedStatementADD.setDouble(7, 0.0);  // 新增用户余额默认为0.0
+            preparedStatementADD.setInt(8, 1);  // 新增用户权限默认为  1
+
             resultADD = preparedStatementADD.executeUpdate();
             if (resultADD != 0) {
                 System.out.println("注册成功！");
+                // 将日志信息写入user_logs
+                userLogs(user.getAccountCard(), "Sign", 0);
                 return 2;
             } else {
                 System.out.println("注册失败！");
@@ -91,6 +98,8 @@ public class UserDao_imp implements UserDao {
                     preparedStatementLogin.setString(2, user.getPassword());
                     resultLogin = preparedStatementLogin.executeQuery();
                     while (resultLogin.next()) {
+                        // 将日志信息写入user_logs
+                        userLogs(user.getAccountCard(), "Login", 0);
                         if (resultLogin.getInt("type") == 0) {
                             System.out.println("恭喜管理员登录成功！");
                             return 0;
@@ -125,6 +134,8 @@ public class UserDao_imp implements UserDao {
             int deleteFlag = preparedStatement.executeUpdate();
             if (deleteFlag > 0) {
                 System.out.println("删除用户成功");
+                // 将日志信息写入user_logs
+                userLogs(accountCard, "Delete", 0);
                 return 1;
             } else {
                 System.out.println("删除用户失败");
@@ -145,6 +156,8 @@ public class UserDao_imp implements UserDao {
             int changePasswordFlag = preparedStatement.executeUpdate();
             if (changePasswordFlag > 0) {
                 System.out.println("修改账户姓名成功");
+                // 将日志信息写入user_logs
+                userLogs(user.getAccountCard(), "Change Name", 0);
                 return 1;
             } else {
                 System.out.println("修改账户姓名失败");
@@ -164,6 +177,8 @@ public class UserDao_imp implements UserDao {
             int changePasswordFlag = preparedStatement.executeUpdate();
             if (changePasswordFlag > 0) {
                 System.out.println("修改电话号码成功");
+                // 将日志信息写入user_logs
+                userLogs(user.getAccountCard(), "Change Mobile Phone", 0);
                 return 1;
             } else {
                 System.out.println("修改电话号码失败");
@@ -184,6 +199,8 @@ public class UserDao_imp implements UserDao {
             int changePasswordFlag = preparedStatement.executeUpdate();
             if (changePasswordFlag > 0) {
                 System.out.println("修改密码成功");
+                // 将日志信息写入user_logs
+                userLogs(user.getAccountCard(), "Change Password", 0);
                 return 1;
             } else {
                 System.out.println("修改密码失败");
@@ -202,6 +219,9 @@ public class UserDao_imp implements UserDao {
             preparedStatement.setInt(1,user.getAccountCard());
             ResultSet result = preparedStatement.executeQuery();
             while (result.next()) {
+                // 将日志信息写入user_logs
+                userLogs(user.getAccountCard(), "Select userInfo", 0);
+                // 输出用户信息
                 String signTime = String.valueOf(result.getDate("signTime"));
                 int accountCard = result.getInt("accountCard");
                 String accountName = result.getString("accountName");
@@ -234,12 +254,14 @@ public class UserDao_imp implements UserDao {
             while(result.next()){
                 double balance = result.getDouble("balance");
                 if(balance > 0  && balance >= money){
-                    PreparedStatement preparedStatement1 = conn.prepareStatement(SQL_USER_DRAW_MONEY);
+                    PreparedStatement preparedStatement1 = conn.prepareStatement(SQL_USER_OPER_MONEY);
                     preparedStatement1.setDouble(1,(balance-money));
                     preparedStatement1.setInt(2,accountCard);
                     int drawFlag = preparedStatement1.executeUpdate();
                     if(drawFlag > 0){
                         System.out.println("取款成功");
+                        // 将日志信息写入user_logs
+                        userLogs(accountCard, "Draw Money", money);
                         return 1;
                     }else {
                         System.out.println("取款失败");
@@ -270,12 +292,14 @@ public class UserDao_imp implements UserDao {
             while(result.next()){
                 double balance = result.getDouble("balance");
                 if(balance >= 0){
-                    PreparedStatement preparedStatement1 = conn.prepareStatement(SQL_USER_DRAW_MONEY);
+                    PreparedStatement preparedStatement1 = conn.prepareStatement(SQL_USER_OPER_MONEY);
                     preparedStatement1.setDouble(1,(balance+money));
                     preparedStatement1.setInt(2,accountCard);
                     int drawFlag = preparedStatement1.executeUpdate();
                     if(drawFlag > 0){
                         System.out.println("存款成功");
+                        // 将日志信息写入user_logs
+                        userLogs(accountCard, "Save Money", money);
                         return 1;
                     }else {
                         System.out.println("存款失败");
@@ -315,12 +339,12 @@ public class UserDao_imp implements UserDao {
                         double OldBalance = result.getDouble("balance");
                         if(OldBalance > 0 && newBalance >= 0  && OldBalance >= money){
                             //  老账户减
-                            PreparedStatement preparedStatement1 = conn.prepareStatement(SQL_USER_DRAW_MONEY);
+                            PreparedStatement preparedStatement1 = conn.prepareStatement(SQL_USER_OPER_MONEY);
                             preparedStatement1.setDouble(1,(OldBalance-money));
                             preparedStatement1.setInt(2,oldAccountCard);
 
                             // 新账户加
-                            PreparedStatement preparedStatement3 = conn.prepareStatement(SQL_USER_DRAW_MONEY);
+                            PreparedStatement preparedStatement3 = conn.prepareStatement(SQL_USER_OPER_MONEY);
                             preparedStatement3.setDouble(1,(newBalance+money));
                             preparedStatement3.setInt(2,newAccountCard);
 
@@ -328,6 +352,9 @@ public class UserDao_imp implements UserDao {
                             int saveFlag = preparedStatement3.executeUpdate();
                             if(drawFlag > 0 && saveFlag > 0){
                                 System.out.println("转账成功");
+                                // 将日志信息写入user_logs
+                                userLogs(oldAccountCard, "Transfer Draw Money", money);
+                                userLogs(newAccountCard, "Transfer Save Money", money);
                                 return 1;
                             }else {
                                 System.out.println("转账失败");
@@ -375,8 +402,45 @@ public class UserDao_imp implements UserDao {
     // 用户查看自己余额变化
     @Override
     public int balanceChange(int accountCard) {
-        System.out.println("operateTime\t\t\taccountCard\t\toper\t\tbalance\t\tmoney");
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(SQL_USER_LOGS_SELECT);
+            preparedStatement.setInt(1,accountCard);
+            ResultSet result = preparedStatement.executeQuery();
+            System.out.println("operateTime\t\t\taccountCard\t\toper\t\tbalance\t\t\tmoney");
+            while(result.next()){
+                String operateTime = result.getString("operateTime");
+                int accountCard1 = result.getInt("accountCard");
+                String oper = result.getString("oper");
+                String balance = result.getString("balance");
+                String money = result.getString("money");
+                System.out.println(operateTime + "\t\t" + accountCard1 + "\t\t\t" + oper + "\t\t\t" + balance + "\t\t\t" +money);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
         return 0;
     }
 
+    // 将用户操作日志写入日志表
+    private int userLogs(int AccountCard, String oper, double money){
+        Connection conn = JDBCUtils.getConnection();
+        try {
+            // 将日志信息写入user_logs
+            PreparedStatement preparedStatementLogs = conn.prepareStatement(SQL_USER_LOGS);
+            preparedStatementLogs.setString(1, dateFormat.format(date));
+            preparedStatementLogs.setInt(2, AccountCard);
+            preparedStatementLogs.setString(3,oper);
+            preparedStatementLogs.setDouble(4,money);
+            int logFlag = preparedStatementLogs.executeUpdate();
+            if (logFlag > 0){
+                System.out.println("用户日志写入成功");
+            }else {
+                System.out.println("用户日志写入失败");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return 1;
+    }
 }
